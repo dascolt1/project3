@@ -17,4 +17,5 @@ Plan here:
 3. Have to write hashtable from scratch
    - https://www.tutorialspoint.com/data_structures_algorithms/hash_table_program_in_c.htm
 4. Checks
-   - Make sure valid input + if 3 times wrong, display "Try again in 1 hour"
+   - Make sure valid input
+   - If 3 times wrong, display "Try again in 1 hour"
