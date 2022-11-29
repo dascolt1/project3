@@ -16,7 +16,9 @@ class Project3 {
             String line;
             String[] arrOfStr = new String[100];
             while ((line = br.readLine()) != null) {
+                // gets username/password pairs
                 arrOfStr = line.split(", ", 0);
+                // adds them to hashtable
                 ht.put(arrOfStr[0], arrOfStr[1]);
             }
 
