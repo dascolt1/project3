@@ -1,4 +1,4 @@
-#Project 3 for CS 520
+Project 3 for CS 520
 
 This project is a login system written in C utilizing a hashtable for user lookup
 
