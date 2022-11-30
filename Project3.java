@@ -5,6 +5,10 @@
 
 import java.util.*;
 import java.io.*;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 class Project3 {
 
@@ -27,37 +31,74 @@ class Project3 {
 
     private static void writeLogFile(String filePath, String logOutput) {
         // TODO implement file writing
+        try {
+            FileWriter fWriter = new FileWriter(filePath, true);
+
+            fWriter.write(logOutput);
+
+            fWriter.close();
+        }
+
+        // Catch block to handle if exception occurs
+        catch (IOException e) {
+
+            // Print the exception
+            System.out.print(e.getMessage());
+        }
     }
 
-    private static void handleLogin(String filePath, boolean login) {
+    private static String getIpAddress() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostAddress();
+    }
+
+    private static void handleLogin(String filePath, boolean login, String username) throws UnknownHostException {
         int numberOfTries = 3;
         if (login == true) {
             System.out.println("Login Successful");
-            writeLogFile(filePath, "Test");
+            String date = getDate();
+            String ipAddress = getIpAddress();
+            String log = "[SUCCESS] " + username + " <" + ipAddress + "> " + date + "\n";
+            writeLogFile(filePath, log);
             System.exit(0);
         } else {
             System.out.println("Username or password incorrect.");
             numberOfTries--;
+            String date = getDate();
+            String ipAddress = getIpAddress();
+            String log = "[FAILED] " + username + " <" + ipAddress + "> " + date + "\n";
+            writeLogFile(filePath, log);
             if (numberOfTries == 0) {
                 System.out.println("Account locked, please try again in an hour.");
+                String failedThreeTimes = "[MULTIPLE FAILURES] " + username + " <" + ipAddress + "> " + date + "\n";
+                writeLogFile(filePath, failedThreeTimes);
             }
         }
     }
 
-    public static void main(String args[]) throws FileNotFoundException {
+    private static String getDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        return dtf.format(now);
+    }
+
+    public static void main(String args[]) throws FileNotFoundException, UnknownHostException {
         Hashtable<String, String> hashTable = new Hashtable<String, String>();
         String fileToRead = "LoginsAndPasswords.txt";
         String fileToWrite = "signIn.txt";
 
-        String username = "jjohns@stevens.edu";
+        String username = "johns@stevens.edu";
         String password = "0ski22";
 
         readLoginFile(fileToRead, hashTable);
 
-        if (hashTable.get(username).equals(password)) {
-            handleLogin(fileToWrite, true);
+        if (hashTable.get(username) != null) {
+            if (hashTable.get(username).equals(password)) {
+                handleLogin(fileToWrite, true, username);
+            } else {
+                handleLogin(fileToWrite, false, username);
+            }
         } else {
-            handleLogin(fileToWrite, false);
+            handleLogin(fileToWrite, false, username);
         }
     }
 }
