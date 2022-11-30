@@ -30,19 +30,13 @@ class Project3 {
     }
 
     private static void writeLogFile(String filePath, String logOutput) {
-        // TODO implement file writing
         try {
             FileWriter fWriter = new FileWriter(filePath, true);
 
             fWriter.write(logOutput);
 
             fWriter.close();
-        }
-
-        // Catch block to handle if exception occurs
-        catch (IOException e) {
-
-            // Print the exception
+        } catch (IOException e) {
             System.out.print(e.getMessage());
         }
     }
@@ -69,7 +63,8 @@ class Project3 {
             writeLogFile(filePath, log);
             if (numberOfTries == 0) {
                 System.out.println("Account locked, please try again in an hour.");
-                String failedThreeTimes = "[MULTIPLE FAILURES] " + username + " <" + ipAddress + "> " + date + "\n";
+                String failedThreeTimes = "[MULTIPLE FAILURES - POTENTIAL SECURITY WARNING] " + username + " <"
+                        + ipAddress + "> " + date + "\n";
                 writeLogFile(filePath, failedThreeTimes);
             }
         }
