@@ -16,6 +16,7 @@ class Project3 {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             String[] arrOfStr = new String[2];
+
             while ((line = br.readLine()) != null) {
                 // gets username/password pairs
                 arrOfStr = line.split(", ", 0);
@@ -49,18 +50,24 @@ class Project3 {
         int numberOfTries = 3;
         if (login == true) {
             System.out.println("Login Successful");
+
             String date = getDate();
             String ipAddress = getIpAddress();
             String log = "[SUCCESS] " + username + " <" + ipAddress + "> " + date + "\n";
+
             writeLogFile(filePath, log);
+
             System.exit(0);
         } else {
             System.out.println("Username or password incorrect.");
             numberOfTries--;
+
             String date = getDate();
             String ipAddress = getIpAddress();
             String log = "[FAILED] " + username + " <" + ipAddress + "> " + date + "\n";
+
             writeLogFile(filePath, log);
+
             if (numberOfTries == 0) {
                 System.out.println("Account locked, please try again in an hour.");
                 String failedThreeTimes = "[MULTIPLE FAILURES - POTENTIAL SECURITY WARNING] " + username + " <"
@@ -80,8 +87,9 @@ class Project3 {
         Hashtable<String, String> hashTable = new Hashtable<String, String>();
         String fileToRead = "LoginsAndPasswords.txt";
         String fileToWrite = "signIn.txt";
+        // TODO make login prompt
 
-        String username = "johns@stevens.edu";
+        String username = "jjohns@stevens.edu";
         String password = "0ski22";
 
         readLoginFile(fileToRead, hashTable);
