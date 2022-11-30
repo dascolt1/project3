@@ -16,13 +16,13 @@ class Project3 {
     private static void readLoginFile(String filePath, Hashtable<String, String> ht) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            String[] arrOfStr = new String[2];
+            String[] usernamePasswordPairs = new String[2];
 
             while ((line = br.readLine()) != null) {
                 // gets username/password pairs
-                arrOfStr = line.split(", ", 0);
+                usernamePasswordPairs = line.split(", ", 0);
                 // adds them to hashtable
-                ht.put(arrOfStr[0], arrOfStr[1]);
+                ht.put(usernamePasswordPairs[0], usernamePasswordPairs[1]);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -47,35 +47,48 @@ class Project3 {
         return InetAddress.getLocalHost().getHostAddress();
     }
 
-    private static void handleLogin(String filePath, boolean login, String username) throws UnknownHostException {
-        int numberOfTries = 3;
-        if (login == true) {
-            System.out.println("Login Successful");
+    private static void handleFailedLogin(String filePath, String username, int numberOfTries)
+            throws UnknownHostException {
 
-            String date = getDate();
-            String ipAddress = getIpAddress();
-            String log = "[SUCCESS] " + username + " <" + ipAddress + "> " + date + "\n";
+        System.out.println("Username or password incorrect.");
 
-            writeLogFile(filePath, log);
+        String date = getDate();
+        String ipAddress = getIpAddress();
+        String log = "[FAILED] " + username + " <" + ipAddress + "> " + date + "\n";
 
+        writeLogFile(filePath, log);
+
+        if (numberOfTries == 0) {
+            System.out.println("Account locked, please try again in an hour.");
+            String failedThreeTimes = "[MULTIPLE FAILURES - POTENTIAL SECURITY WARNING] " + username + " <" + ipAddress
+                    + "> " + date + "\n";
+            writeLogFile(filePath, failedThreeTimes);
             System.exit(0);
-        } else {
-            System.out.println("Username or password incorrect.");
-            numberOfTries--;
-
-            String date = getDate();
-            String ipAddress = getIpAddress();
-            String log = "[FAILED] " + username + " <" + ipAddress + "> " + date + "\n";
-
-            writeLogFile(filePath, log);
-
-            if (numberOfTries == 0) {
-                System.out.println("Account locked, please try again in an hour.");
-                String failedThreeTimes = "[MULTIPLE FAILURES - POTENTIAL SECURITY WARNING] " + username + " <"
-                        + ipAddress + "> " + date + "\n";
-                writeLogFile(filePath, failedThreeTimes);
-            }
         }
+    }
+
+    private static void handleInvalidUsernameFailedLogin(String filePath, String username) throws UnknownHostException {
+
+        System.out.println("Username does not exist.");
+
+        String date = getDate();
+        String ipAddress = getIpAddress();
+        String log = "[FAILED] " + username + " <" + ipAddress + "> " + date + "\n";
+
+        writeLogFile(filePath, log);
+        System.exit(0);
+    }
+
+    private static void handleSuccessfulLogin(String filePath, String username) throws UnknownHostException {
+        System.out.println("Login Successful");
+
+        String date = getDate();
+        String ipAddress = getIpAddress();
+        String log = "[SUCCESS] " + username + " <" + ipAddress + "> " + date + "\n";
+
+        writeLogFile(filePath, log);
+
+        System.exit(0);
     }
 
     private static String getDate() {
@@ -86,23 +99,33 @@ class Project3 {
 
     public static void main(String args[]) throws FileNotFoundException, UnknownHostException {
         Hashtable<String, String> hashTable = new Hashtable<String, String>();
-        String fileToRead = "LoginsAndPasswords.txt";
-        String fileToWrite = "signIn.txt";
-        // TODO make login prompt
+        final String fileToRead = "LoginsAndPasswords.txt";
+        final String fileToWrite = "signIn.txt";
 
-        String username = "jjohns@stevens.edu";
-        String password = "0ski22";
+        boolean continuePrompt = true;
+        Scanner sc = new Scanner(System.in);
+
+        int correctTriesLimit = 3;
 
         readLoginFile(fileToRead, hashTable);
 
-        if (hashTable.get(username) != null) {
-            if (hashTable.get(username).equals(password)) {
-                handleLogin(fileToWrite, true, username);
+        while (continuePrompt) {
+            System.out.println("Please enter username:");
+            String username = sc.nextLine();
+            System.out.println("Please enter password:");
+            String password = sc.nextLine();
+
+            if (hashTable.get(username) != null) {
+                if (hashTable.get(username).equals(password)) {
+                    handleSuccessfulLogin(fileToWrite, username);
+                } else {
+                    correctTriesLimit--;
+                    handleFailedLogin(fileToWrite, username, correctTriesLimit);
+                }
             } else {
-                handleLogin(fileToWrite, false, username);
+                handleInvalidUsernameFailedLogin(fileToWrite, username);
             }
-        } else {
-            handleLogin(fileToWrite, false, username);
         }
+        sc.close();
     }
 }
