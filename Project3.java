@@ -1,6 +1,7 @@
 /*
 * Professor Reid CS 520
 * Tommy D'Ascoli and Prashant Patil
+* Github repo: https://github.com/dascolt1/project3
 */
 
 import java.util.*;
